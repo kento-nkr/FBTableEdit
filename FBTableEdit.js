@@ -187,7 +187,7 @@ function loadCDN(url, type)
 function testModal()
 {
     const fieldcode = "緊急連絡先_0"
-    addModalBtn(fieldcode)
+    addModalBtn(fieldcode, 0)
 }
 
 async function main()
