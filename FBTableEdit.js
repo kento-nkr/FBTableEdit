@@ -16,17 +16,36 @@ function addModalBtn(fieldcode, modalId)
         return;
     }
 
+    const rowNum = 0
+
 
     // ボタンがクリックされたときの処理を設定
     button.addEventListener("click", () =>
     {
         const InputInfo = FBgetTableContents(fieldcode);
         console.log("tableInfo : ", InputInfo)
-        const modalElement = makeModalDom(modalId, InputInfo[0])
+        const modalElement = makeModalDom(modalId, InputInfo[rowNum])
         // ページの適切な場所にモーダルを追加
         document.body.appendChild(modalElement);
         $('#' + modalId).modal('show'); // モーダルを表示する
+
+        // モーダル内の保存ボタンにクリックイベントを追加
+        const saveButton = document.querySelector(`#${modalId} .btn-primary`); // モーダル内の保存ボタンを取得
+        // モーダルが閉じられたときの処理を設定
+        $('#' + modalId).on('hidden.bs.modal', function ()
+        {
+            handleModalClose(modalId, rowNum);
+        });
     });
+}
+
+// モーダルが閉じられたときのイベントハンドラー
+function handleModalClose(modalId)
+{
+    console.log("モーダルが閉じられました。モーダルID:", modalId);
+    // モーダルの内部データを取得して出力する処理を追加する
+    const modalContent = document.querySelector(`#${modalId} .modal-content`);
+    console.log("モーダルの内部データ:", modalContent.innerHTML);
 }
 
 function makeModalDom(modalId, InputInfo)
@@ -95,22 +114,10 @@ function makeModalDom(modalId, InputInfo)
     modalFooter.setAttribute("class", "modal-footer");
     modalFooter.innerHTML = `
         <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-        <button type="button" class="btn btn-primary">保存する</button>
     `;
     modalContent.appendChild(modalFooter);
 
     return modalElement;
-}
-
-function makeDomTest()
-{
-    const InputInfo = [[{ "name": "姓", "id": "緊急連絡先姓_0", "value": "a" },
-    { "name": "名", "id": "緊急連絡先名_0", "value": "" }, { "name": "セイ", "id": "緊急連絡先姓カナ_0", "value": "" }, { "name": "メイ", "id": "緊急連絡先名カナ_0", "value": "" }, { "name": "関係", "id": "続柄_0", "value": "" }, { "name": "電話番号", "id": "電話番号_0", "value": "" }, { "name": "電話番号（予備）", "id": "電話番号予備_0", "value": "" }, { "name": "住所", "id": "住所_0", "value": "" }], [{ "name": "姓", "id": "緊急連絡先姓_0", "value": "b" }, { "name": "名", "id": "緊急連絡先名_0", "value": "" }, { "name": "セイ", "id": "緊急連絡先姓カナ_0", "value": "" }, { "name": "メイ", "id": "緊急連絡先名カナ_0", "value": "" }, { "name": "関係", "id": "続柄_0", "value": "" }, { "name": "電話番号", "id": "電話番号_0", "value": "" }, { "name": "電話番号（予備）", "id": "電話番号予備_0", "value": "" }, { "name": "住所", "id": "住所_0", "value": "" }]]
-
-    //InputInfoの長さInputInfo.length分だけmodalのページを作る。
-    //複数枚のmodalページはラジオボタンで切り替え可能
-    const modalElement = makeModalDom(modalId, InputInfo[0])
-
 }
 
 function FBgetTableContents(fieldcode)
