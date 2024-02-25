@@ -1,4 +1,4 @@
-function addModalBtn(fieldcode, modalId)
+function addModalBtn(fieldcode, rowNum)
 {
     // ボタン要素を作成
     const button = document.createElement("button");
@@ -16,7 +16,7 @@ function addModalBtn(fieldcode, modalId)
         return;
     }
 
-    const rowNum = 0
+    const modalId = `${fieldcode}-${rowNum}`;
 
 
     // ボタンがクリックされたときの処理を設定
@@ -39,13 +39,26 @@ function addModalBtn(fieldcode, modalId)
     });
 }
 
+function getValuesFromModal(modalId)
+{
+    let result = []
+    const modalId = "緊急連絡先_0-0"
+    const modalContent = document.querySelector(`#${modalId} .modal-content`);
+    const divs = modalContent.getElementsByClassName("modal-body")[0].getElementsByTagName("div");
+    for (let i = 0; i < divs.length; i++)
+    {
+        const id = divs[i].firstChild.getAttribute("id")
+        const value = divs[i].firstChild.value;
+        result.push({ id: id, value: value })
+    }
+    return result;
+}
+
 // モーダルが閉じられたときのイベントハンドラー
 function handleModalClose(modalId)
 {
     console.log("モーダルが閉じられました。モーダルID:", modalId);
-    // モーダルの内部データを取得して出力する処理を追加する
-    const modalContent = document.querySelector(`#${modalId} .modal-content`);
-    console.log("モーダルの内部データ:", modalContent.innerHTML);
+    console.log("モーダルの内部データ:", getValuesFromModal(modalId));
 }
 
 function makeModalDom(modalId, InputInfo)
@@ -98,7 +111,7 @@ function makeModalDom(modalId, InputInfo)
         const inputElement = document.createElement("input");
         inputElement.setAttribute("type", "text");
         inputElement.setAttribute("class", "form-control"); // Bootstrapのクラスを追加
-        inputElement.setAttribute("id", `${modalId}_${input.id}`);
+        inputElement.setAttribute("id", `${input.id}`);
         for (const key in input.attribute)
         {
             inputElement.setAttribute(key, input.attribute[key]);
@@ -173,22 +186,8 @@ function loadCDN(url, type)
 
 function testModal()
 {
-
     const fieldcode = "緊急連絡先_0"
-    const modalId = "testModal"
-
-    // const InputInfo = [{
-    //     id: "tel", name: "telephone", attribute: {
-    //         autocomplete: "tel",
-    //         inputmode: "tel",
-    //         placeholder: "08012345678",
-    //     }, value: undefined
-    // }, {
-    //     id: "name", name: "name", attribute: {
-    //         autocomplete: "family-name"
-    //     }, value: undefined
-    // },]
-    addModalBtn(fieldcode, modalId)
+    addModalBtn(fieldcode)
 }
 
 async function main()
