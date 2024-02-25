@@ -22,6 +22,7 @@ function addModalBtn(fieldcode, rowNum)
     // ボタンがクリックされたときの処理を設定
     button.addEventListener("click", () =>
     {
+        console.log("bined modal id is : ", modalId);
         const InputInfo = FBgetTableContents(fieldcode);
         console.log("tableInfo : ", InputInfo)
         const modalElement = makeModalDom(modalId, InputInfo[rowNum])
