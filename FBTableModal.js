@@ -246,6 +246,8 @@ class FBTableModal {
     addButton.textContent = "追加";
     addButton.addEventListener("click", () => {
       this.addTableRow();
+      this.tableContents = this.getTableContents();
+      this.showPageContent(modalBody, this.tableContents.length - 1);
     });
     pageButtonArea.appendChild(addButton);
     const hr = document.createElement("hr");
@@ -287,6 +289,7 @@ class FBTableModal {
       if (this.tableContents.length == 0) {
         $("#" + this.modalId).modal("hide");
       } else {
+        this.tableContents = this.getTableContents();
         this.showPageContent(modalBody, rowNum);
       }
     });
