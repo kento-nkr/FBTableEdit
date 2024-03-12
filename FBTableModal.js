@@ -1,10 +1,8 @@
-class FBTableModal
-{
+class FBTableModal {
   table_fieldcode = "";
   table_dom;
 
-  constructor(table_fieldcode)
-  {
+  constructor(table_fieldcode) {
     this.#loadBootStrap();
     this.table_fieldcode = table_fieldcode;
     this.table_dom = document.querySelector(
@@ -16,14 +14,12 @@ class FBTableModal
       );
     this.#setTableStateSync();
     this.#addEditButton();
-    fb.events.form.mounted.push(() =>
-    {
+    fb.events.form.mounted.push(() => {
       this.#addEditButton();
     });
   }
 
-  getTableContents()
-  {
+  getTableContents() {
     //result=[{id: fieldcode, name: 表示名, value:""}, {.}, ...]
     let result = [];
     const ths = this.table_dom
@@ -35,16 +31,14 @@ class FBTableModal
       .getElementsByTagName("table")[0]
       .getElementsByTagName("tbody")[0]
       .getElementsByTagName("tr");
-    for (let rown = 0; rown < tableBodyRows.length; rown++)
-    {
+    for (let rown = 0; rown < tableBodyRows.length; rown++) {
       let row = [];
       const tds = tableBodyRows[rown].getElementsByTagName("td");
       for (
         let i = 0;
         i < ths.length - 1;
         i++ //ボタンの列を除外するため、-1
-      )
-      {
+      ) {
         const name = ths[i].getElementsByTagName("label")[0].innerText;
         const dataVvName = tds[i].firstChild.getAttribute("data-vv-name");
         const id = dataVvName.split("-")[2];
@@ -56,21 +50,18 @@ class FBTableModal
     return result;
   }
 
-  setTableVisible(is_visible)
-  {
+  setTableVisible(is_visible) {
     if (is_visible) this.table_dom.computedStyleMap, (display = "");
     else this.table_dom.computedStyleMap, (display = "none");
   }
 
-  addTableRow()
-  {
+  addTableRow() {
     this.table_dom
       .getElementsByClassName("ui circular blue icon button")[0]
       .click();
   }
 
-  deleteTableRow(rowNum)
-  {
+  deleteTableRow(rowNum) {
     const targetRow = this.table_dom.getElementsByClassName(
       "ui circular orange icon button"
     )[rowNum];
@@ -79,8 +70,7 @@ class FBTableModal
     else targetRow.click();
   }
 
-  setRowValuesToTable(rowNum, valueObj)
-  {
+  setRowValuesToTable(rowNum, valueObj) {
     // valueObj=[{dataVvName:"", value:""}, {.}, ...]
     const tableBody = this.table_dom
       .getElementsByTagName("table")[0]
@@ -88,11 +78,9 @@ class FBTableModal
       .getElementsByTagName("tr");
     if (tableBody.length <= rowNum)
       console.error(`table ${this.table_fieldcode} haven't row num ${rowNum}.`);
-    else
-    {
+    else {
       const targetRow = tableBody[rowNum];
-      valueObj.forEach((elem) =>
-      {
+      valueObj.forEach((elem) => {
         const targetDiv = targetRow.querySelector(
           `[data-vv-name="${elem.dataVvName}"]`
         );
@@ -100,8 +88,7 @@ class FBTableModal
           console.error(
             `table ${this.table_fieldcode}[${rowNum}] haven't data-vv-name="${elem.dataVvName}" object.`
           );
-        else
-        {
+        else {
           const targetInput = targetDiv.getElementsByTagName("input")[0];
           targetInput.value = elem.value;
         }
@@ -109,25 +96,20 @@ class FBTableModal
     }
   }
 
-  setValuesToTable(valueObj)
-  {
+  setValuesToTable(valueObj) {
     // valueObj=[ rowObj1, rowObj2, ...]
     // rowObj=[ {dataVvName:"", value:""}, {.}, ... ]
     for (let i = 0; i < valueObj.length; i++)
       this.setRowValuesToTable(i, valueObj[i]);
   }
 
-  #setTableStateSync()
-  {
+  #setTableStateSync() {
     //table単位でconfirm時にstate同期させる。インスタンス化時の一回の呼び出しだけでよい
-    fb.events.form.confirm.push((state) =>
-    {
+    fb.events.form.confirm.push((state) => {
       const table_contents = this.getTableContents();
-      for (let rowNum = 0; rowNum < table_contents.length; rowNum++)
-      {
+      for (let rowNum = 0; rowNum < table_contents.length; rowNum++) {
         const row = table_contents[rowNum];
-        row.forEach((element) =>
-        {
+        row.forEach((element) => {
           const columnFieldcode = element.id;
           state.record[this.table_fieldcode].value[rowNum].value[
             columnFieldcode
@@ -138,8 +120,7 @@ class FBTableModal
     });
   }
 
-  #addEditButton()
-  {
+  #addEditButton() {
     this.modalId = `${this.table_fieldcode}`;
     this.editButtonId = `${this.table_fieldcode}_editButton`;
 
@@ -158,24 +139,24 @@ class FBTableModal
 
     // ボタンがクリックされたときの処理を設定
     // 追加のイベントを登録したい場合は、document.getElementById(this.editButtonId).addEventListener("click", () => { ... });
-    button.addEventListener("click", () =>
-    {
+    button.addEventListener("click", () => {
       const modalElement = this.#makeModalDOM();
       document.body.appendChild(modalElement); // bodyの末尾にモーダルを追加
       $("#" + this.modalId).modal("show"); // モーダルを表示する
       //modalが閉じられた時、modalを削除し、モーダルの中身をtableに反映させる
-      $("#" + this.modalId).on("hidden.bs.modal", () =>
-      {
+      $("#" + this.modalId).on("hidden.bs.modal", () => {
         const modalRowNumAndValue = this.getValuesFromModal();
-        this.setRowValuesToTable(modalRowNumAndValue.rowNum, modalRowNumAndValue.value);
+        this.setRowValuesToTable(
+          modalRowNumAndValue.rowNum,
+          modalRowNumAndValue.value
+        );
 
         modalElement.remove(); //最後に実行
       });
     });
   }
 
-  #makeModalDOM()
-  {
+  #makeModalDOM() {
     this.tableContents = this.getTableContents();
     const modalElement = document.createElement("div");
     modalElement.setAttribute("class", "modal fade");
@@ -221,36 +202,35 @@ class FBTableModal
     return modalElement;
   }
 
-  showPageContent(modalBody, rowNum)
-  {
+  showPageContent(modalBody, rowNum) {
     // ページ切り替え時にモーダルボディをクリア
     modalBody.innerHTML = "";
 
     const paggContent = document.createElement("div");
-    paggContent.setAttribute("id", `${this.modalId}_pageContent`)
+    paggContent.setAttribute("id", `${this.modalId}_pageContent`);
     paggContent.setAttribute("class", "page-content");
     paggContent.setAttribute("rowNum", rowNum);
     const pageButtonArea = document.createElement("div");
     pageButtonArea.setAttribute("class", "page-button-area");
     const pageFormArea = document.createElement("div");
-    pageFormArea.setAttribute("class", "page-form-area")
+    pageFormArea.setAttribute("class", "page-form-area");
 
     // ページ切り替えボタンを追加
     const pageCount = this.tableContents.length;
-    for (let i = 0; i < pageCount; i++)
-    {
+    for (let i = 0; i < pageCount; i++) {
       const pageButton = document.createElement("button");
       pageButton.setAttribute("type", "button");
       pageButton.setAttribute("class", "btn btn-primary page-switch-button");
       pageButton.textContent = `${i + 1}`;
       pageButton.setAttribute("data-page", i);
-      if (i == rowNum)
-      {
-        // 色をグレーにする
-      } else
-      {
-        pageButton.addEventListener("click", () =>
-        {
+      if (i == rowNum) {
+        pageButton.setAttribute(
+          "class",
+          "btn btn-secondary page-switch-button"
+        );
+        pageButton.setAttribute("disabled", "true");
+      } else {
+        pageButton.addEventListener("click", () => {
           const modalRowNumAndValue = this.getValuesFromModal();
           this.setRowValuesToTable(rowNum, modalRowNumAndValue.value);
           this.showPageContent(modalBody, i);
@@ -258,11 +238,23 @@ class FBTableModal
       }
       pageButtonArea.appendChild(pageButton);
     }
+    //追加ボタンを追加
+    const addButton = document.createElement("button");
+    addButton.setAttribute("type", "button");
+    addButton.setAttribute("class", "btn btn-primary");
+    addButton.style.backgroundColor = "green";
+    addButton.textContent = "追加";
+    addButton.addEventListener("click", () => {
+      this.addTableRow();
+    });
+    pageButtonArea.appendChild(addButton);
+    const hr = document.createElement("hr");
+    pageFormArea.appendChild(hr);
 
     const targetTableContent = this.tableContents[rowNum];
+
     // ページの入力フィールドを表示
-    targetTableContent.forEach((input) =>
-    {
+    targetTableContent.forEach((input) => {
       const labelElement = document.createElement("label");
       labelElement.setAttribute("class", "col-sm-3 col-form-label");
       labelElement.textContent = input.name;
@@ -275,8 +267,7 @@ class FBTableModal
       inputElement.setAttribute("class", "form-control");
       inputElement.setAttribute("id", input.id);
       inputElement.setAttribute("data-vv-name", input.dataVvName);
-      for (const key in input.attribute)
-      {
+      for (const key in input.attribute) {
         inputElement.setAttribute(key, input.attribute[key]);
       }
       inputElement.value = input.value;
@@ -284,21 +275,36 @@ class FBTableModal
       pageFormArea.appendChild(inputDiv);
     });
 
+    pageFormArea.appendChild(hr);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.setAttribute("type", "button");
+    deleteButton.setAttribute("class", "btn btn-primary");
+    deleteButton.style.backgroundColor = "orange";
+    deleteButton.textContent = "削除";
+    deleteButton.addEventListener("click", () => {
+      this.deleteTableRow(rowNum);
+      if (this.tableContents.length == 0) {
+        $("#" + this.modalId).modal("hide");
+      } else {
+        this.showPageContent(modalBody, rowNum);
+      }
+    });
+    pageFormArea.appendChild(deleteButton);
+
     paggContent.appendChild(pageButtonArea);
     paggContent.appendChild(pageFormArea);
     modalBody.appendChild(paggContent);
   }
 
-  getValuesFromModal()
-  {
+  getValuesFromModal() {
     let result = {}; //{rowNum: . , values: [{id: , dataVvName: , value: }, {.}, ...]}
-    const modalContent = document.getElementById(`${this.modalId}_pageContent`)
+    const modalContent = document.getElementById(`${this.modalId}_pageContent`);
     result.rowNum = modalContent.getAttribute("rowNum");
-    result.value = []
+    result.value = [];
     const inputElements = modalContent.getElementsByTagName("input");
-    for (let i = 0; i < inputElements.length; i++)
-    {
-      const input = inputElements[i]
+    for (let i = 0; i < inputElements.length; i++) {
+      const input = inputElements[i];
       const id = input.getAttribute("id"); // 入力フィールドのIDを取得
       const dataVvName = input.getAttribute("data-vv-name"); // 入力フィールドのdataVvNameを取得
       const value = input.value; // 入力フィールドの値を取得
@@ -307,28 +313,22 @@ class FBTableModal
     return result;
   }
 
-  async #loadBootStrap()
-  {
-    function loadCDN(url, type)
-    {
-      return new Promise((resolve, reject) =>
-      {
+  async #loadBootStrap() {
+    function loadCDN(url, type) {
+      return new Promise((resolve, reject) => {
         let scriptOrLink;
-        if (type === "script")
-        {
+        if (type === "script") {
           scriptOrLink = document.createElement("script");
           scriptOrLink.onload = resolve;
           scriptOrLink.onerror = reject;
           scriptOrLink.src = url;
-        } else if (type === "link")
-        {
+        } else if (type === "link") {
           scriptOrLink = document.createElement("link");
           scriptOrLink.onload = resolve;
           scriptOrLink.onerror = reject;
           scriptOrLink.rel = "stylesheet";
           scriptOrLink.href = url;
-        } else
-        {
+        } else {
           reject(new Error("Invalid type specified"));
           return;
         }
@@ -337,8 +337,7 @@ class FBTableModal
     }
 
     if (typeof jQuery !== "undefined") console.log("jQuery is loaded");
-    else
-    {
+    else {
       console.log("jQuery is not loaded");
       const jqueryScriptUrl =
         "https://code.jquery.com/jquery-3.5.1.slim.min.js";
@@ -346,8 +345,7 @@ class FBTableModal
     }
 
     if (typeof $().modal === "function") console.log("Bootstrap is loaded");
-    else
-    {
+    else {
       console.log("Bootstrap is not loaded");
       const bootstrapCssUrl =
         "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css";
