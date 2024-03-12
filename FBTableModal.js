@@ -10,6 +10,7 @@ class FBTableModal
         this.table_dom = document.querySelector(`[data-vv-name="${this.table_fieldcode}"]`);
         if (this.table_dom == undefined) console.error(`fieldcode=${table_fieldcode} is not defined as Table element. Please check your FB setting.`)
         this.#setTableStateSync()
+        this.#addEditButton()
     }
 
     getTableContents()
@@ -45,6 +46,7 @@ class FBTableModal
     {
         this.table_dom.getElementsByClassName("ui circular blue icon button")[0].click()
     }
+
     deleteTableRow(rowNum)
     {
         const targetRow = this.table_dom.getElementsByClassName("ui circular orange icon button")[rowNum]
@@ -52,7 +54,7 @@ class FBTableModal
         else targetRow.click()
     }
 
-    setValuesToTable(rowNum, valueObj)
+    setRowValuesToTable(rowNum, valueObj)
     {
         // valueObj=[{dataVvName:"", value:""}, {.}, ...]
         const tableBody = this.table_dom.getElementsByTagName("table")[0].getElementsByTagName("tbody")[0].getElementsByTagName("tr")
@@ -67,10 +69,18 @@ class FBTableModal
                 else
                 {
                     const targetInput = targetDiv.getElementsByTagName("input")[0]
-
+                    targetInput = elem.value
                 }
             })
         }
+    }
+
+    setValuesToTable(valueObj)
+    {
+        // valueObj=[ rowObj1, rowObj2, ...]
+        // rowObj=[ {dataVvName:"", value:""}, {.}, ... ]
+        for (let i = 0; i < valueObj.length; i++)
+            this.setRowValuesToTable(i, valueObj[i]);
     }
 
     #setTableStateSync()
@@ -89,6 +99,54 @@ class FBTableModal
             }
             return state
         })
+    }
+
+    #addEditButton()
+    {
+        this.modalId = `${fieldcode}-${rowNum}`;
+        this.editButtonId = `${this.table_fieldcode}_editButton`;
+
+        // ボタン要素を作成
+        const button = document.createElement("button");
+        button.setAttribute("type", "button");
+        button.setAttribute("class", "btn btn-primary");
+        button.textContent = "編集";
+        button.id = this.editButtonId;
+        // div要素を作成してボタンをラップ
+        const buttonWrapper = document.createElement("div");
+        buttonWrapper.setAttribute("class", "edit-button-wrapper");
+        buttonWrapper.appendChild(button);
+        // 編集ボタンを追加
+        this.table_dom.parentElement.parentElement.appendChild(buttonWrapper);
+
+
+        // // ボタンがクリックされたときの処理を設定
+        // button.addEventListener("click", () =>
+        // {
+        //     console.log("bined modal id is : ", modalId);
+        //     const InputInfo = FBgetTableContents(fieldcode);
+        //     console.log("tableInfo : ", InputInfo)
+        //     const modalElement = makeModalDom(modalId, InputInfo[rowNum])
+        //     // ページの適切な場所にモーダルを追加
+        //     document.body.appendChild(modalElement);
+        //     setAutoBankInput("金融機関名_0", "支店名_0")//modal
+
+
+        //     $('#' + modalId).modal('show'); // モーダルを表示する
+
+        //     // モーダル内の保存ボタンにクリックイベントを追加
+        //     const saveButton = document.querySelector(`#${modalId} .btn-primary`); // モーダル内の保存ボタンを取得
+        //     // モーダルが閉じられたときの処理を設定
+        //     $('#' + modalId).on('hidden.bs.modal', function ()
+        //     {
+        //         handleModalClose(modalId);
+        //     });
+        // });
+    }
+
+    #addModalDOM()
+    {
+
     }
 
     async #loadBootStrap()
