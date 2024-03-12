@@ -215,6 +215,15 @@ class FBTableModal {
     const pageFormArea = document.createElement("div");
     pageFormArea.setAttribute("class", "page-form-area");
 
+    //pageButtonArea内のbutton同士にmarginを追加
+    const style = document.createElement("style");
+    style.textContent = `
+        .page-button-area button {
+          margin-right: 5px;
+        }
+      `;
+    pageButtonArea.appendChild(style);
+
     // ページ切り替えボタンを追加
     const pageCount = this.tableContents.length;
     for (let i = 0; i < pageCount; i++) {
