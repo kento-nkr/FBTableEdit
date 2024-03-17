@@ -15,9 +15,20 @@ This project provides the following functionalities:
 
 ## Usage
 
-**Status:** Under construction
+1. formのdom生成が終わるまで待機
 
-*Usage instructions will be provided here once development is completed.*
+    ```js
+        document.addEventListener("DOMContentLoaded", function (event){
+            // すべてのスクリプトがロードされた後に実行
+            your_function();
+        });
+    ```
+
+2. classのインスタンスを作成
+
+    ```js
+    const インスタンス名 = new FBTableModal("テーブルのフィールドコード")
+    ```
 
 ---
 
