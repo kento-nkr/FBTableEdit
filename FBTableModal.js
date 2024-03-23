@@ -100,41 +100,7 @@ class FBTableModal
     // valueObj=[{id:"", name:"", value:""}, {.}, ...]
     this.table_values[rowNum] = valueObj
     return
-
-    // const tableBody = this.table_dom
-    //   .getElementsByTagName("table")[0]
-    //   .getElementsByTagName("tbody")[0]
-    //   .getElementsByTagName("tr");
-    // if (tableBody.length <= rowNum)
-    //   console.error(`table ${this.table_fieldcode} haven't row num ${rowNum}.`);
-    // else
-    // {
-    //   const targetRow = tableBody[rowNum];
-    //   valueObj.forEach((elem) =>
-    //   {
-    //     const targetDiv = targetRow.querySelector(
-    //       `[data-vv-name="${elem.dataVvName}"]`
-    //     );
-    //     if (targetDiv == undefined)
-    //       console.error(
-    //         `table ${this.table_fieldcode}[${rowNum}] haven't data-vv-name="${elem.dataVvName}" object.`
-    //       );
-    //     else
-    //     {
-    //       const targetInput = targetDiv.getElementsByTagName("input")[0];
-    //       targetInput.value = elem.value;
-    //     }
-    //   });
-    // }
   }
-
-  // setValuesToTable(valueObj)
-  // {
-  //   // valueObj=[ rowObj1, rowObj2, ...]
-  //   // rowObj=[ {dataVvName:"", value:""}, {.}, ... ]
-  //   for (let i = 0; i < valueObj.length; i++)
-  //     this.setRowValuesToTable(i, valueObj[i]);
-  // }
 
   #setTableStateSync()
   {
@@ -241,13 +207,6 @@ class FBTableModal
     this.#showPageContent(modalBody, 0);
 
     modalContent.appendChild(modalBody);
-
-    // const modalFooter = document.createElement("div");
-    // modalFooter.setAttribute("class", "modal-footer");
-    // modalFooter.innerHTML = `
-    //     <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-    // `;
-    // modalContent.appendChild(modalFooter);
 
     return modalElement;
   }
