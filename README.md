@@ -15,12 +15,12 @@
     const インスタンス名 = new FBTableModal("テーブルのフィールドコード")
     ```
 
-## Q&A
+## トラブルシューティング
 <details>
     
 <summary>編集ボタンの表示位置がおかしな場合</summary>
     
-###FormBridgeのフィールド配置の問題です
+### FormBridgeのフィールド配置の問題です
     
 編集ボタンのDOMは、元のテーブルのあったDOMの、親のDOMの末尾に追加されます
 
