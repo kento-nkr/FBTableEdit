@@ -48,7 +48,8 @@
     ```js
     const listener_obj = {
         電話番号: {
-            input: () => { console.log("hello") }
+            // 設定した関数には、引数として設定に使用したFBTableModalのインスタンスが渡される。
+            input: (FBTableModal) => { console.log(FBTableModal.modalId) }
         }
     }
     ```
@@ -76,7 +77,8 @@ function allScriptsLoaded()
     }   //attributeの設定object
     const emergency_list_listener_obj = {
         電話番号: {
-            input: () => { console.log("hello") }
+            // 設定した関数には、引数として設定に使用したFBTableModalのインスタンスが渡される。
+            input: (FBTableModal) => { console.log(FBTableModal.modalId) }
         }
     }   //イベントリスナーの設定object
     const emergency_list = new FBTableModal(
