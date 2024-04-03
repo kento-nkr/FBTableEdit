@@ -177,7 +177,7 @@ class FBTableModal
                 const keys = Object.keys(this.listener_obj[input.id])
                 keys.forEach((key) =>
                 {
-                    inputElement.addEventListener(key, this.listener_obj[input.id][key].bind(this))
+                    inputElement.addEventListener(key, () => this.listener_obj[input.id][key](this))
                 })
             }
             inputElement.value = input.value;
