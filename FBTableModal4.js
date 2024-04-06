@@ -105,7 +105,7 @@ class FBTableModal
         {
             const pageButton = document.createElement("button");
             pageButton.setAttribute("type", "button");
-            pageButton.setAttribute("class", "btn btn-secondary page-switch-button");
+            pageButton.setAttribute("class", "btn btn-outline-secondary page-switch-button");
             pageButton.textContent = `${i + 1}`;
             pageButton.setAttribute("data-page", i);
             if (i == rowNum)
@@ -129,8 +129,7 @@ class FBTableModal
         //追加ボタンを追加
         const addButton = document.createElement("button");
         addButton.setAttribute("type", "button");
-        addButton.setAttribute("class", "btn btn-primary");
-        addButton.style.backgroundColor = "green";
+        addButton.setAttribute("class", "btn btn-outline-primary");
         addButton.textContent = "追加";
         addButton.addEventListener("click", async () =>
         {
@@ -187,8 +186,7 @@ class FBTableModal
 
         const deleteButton = document.createElement("button");
         deleteButton.setAttribute("type", "button");
-        deleteButton.setAttribute("class", "btn btn-primary");
-        deleteButton.style.backgroundColor = "orange";
+        deleteButton.setAttribute("class", "btn btn-danger");
         deleteButton.textContent = "削除";
         deleteButton.addEventListener("click", async () =>
         { //削除イベント
