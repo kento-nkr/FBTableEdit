@@ -2,13 +2,17 @@ class FBTableModal
 {
     table_fieldcode = "";
     table_dom;
-    table_values = []//[[{id: fieldcode, name: 表示名, value:""}, {.}, ...]]
+    table_values = []  //[[{id: fieldcode, name: 表示名, value:""}, {.}, ...]]
     template_row_value = []
+    attribute_obj = {} //{fieldcode:{attributeName:value, ...}, ... }
+    listener_obj = {} //{fieldcode:{timing:function, ...}, ... }
 
-    constructor(table_fieldcode)
+    constructor(table_fieldcode, attribute_obj, listener_obj)
     {
         this.#loadBootStrap();
         this.table_fieldcode = table_fieldcode;
+        this.attribute_obj = attribute_obj
+        this.listener_obj = listener_obj
         this.table_dom = document.querySelector(
             `[data-vv-name="${this.table_fieldcode}"]`
         );
@@ -30,146 +34,6 @@ class FBTableModal
         this.#setTableStateSync();
         this.addEditButton()
         this.setTableVisible(false)
-    }
-
-    #getTableContents()
-    {
-        //result=[[{id: fieldcode, name: 表示名, value:""}, {.}, ...]]
-        let result = [];
-        const ths = this.table_dom
-            .getElementsByTagName("table")[0]
-            .getElementsByTagName("thead")[0]
-            .getElementsByTagName("tr")[0]
-            .getElementsByTagName("th");
-        const tableBodyRows = this.table_dom
-            .getElementsByTagName("table")[0]
-            .getElementsByTagName("tbody")[0]
-            .getElementsByTagName("tr");
-        for (let rown = 0; rown < tableBodyRows.length; rown++)
-        {
-            let row = [];
-            const tds = tableBodyRows[rown].getElementsByTagName("td");
-            for (
-                let i = 0;
-                i < ths.length - 1;
-                i++ //ボタンの列を除外するため、-1
-            )
-            {
-                const name = ths[i].getElementsByTagName("label")[0].innerText;
-                const dataVvName = tds[i].firstChild.getAttribute("data-vv-name");
-                const id = dataVvName.split("-")[2];
-                const value = tds[i].firstChild.getElementsByTagName("input")[0].value;
-                row.push({ name: name, id: id, value: value });
-            }
-            result.push(row);
-        }
-        return result;
-    }
-
-    setTableVisible(is_visible)
-    {
-        if (is_visible) this.table_dom.style.display = ""; // 表示する
-        else this.table_dom.style.display = "none"; // 非表示にする
-    }
-
-
-    addTableRow()
-    {
-        this.table_dom
-            .getElementsByClassName("ui circular blue icon button")[0]
-            .click();
-        this.table_values.push(this.template_row_value)
-    }
-
-    deleteTableRow(rowNum)
-    {
-        const targetRow = this.table_dom.getElementsByClassName(
-            "ui circular orange icon button"
-        )[rowNum];
-        if (targetRow == undefined)
-            console.error(`table ${this.table_fieldcode} has no row num=${rowNum}.`);
-        else
-        {
-            targetRow.click();
-            this.table_values.splice(rowNum, 1)
-        }
-    }
-
-    setRowValuesToTable(rowNum, valueObj)
-    {
-        // valueObj=[{id:"", name:"", value:""}, {.}, ...]
-        this.table_values[rowNum] = valueObj
-        return
-    }
-
-    #setTableStateSync()
-    {
-        //table単位でconfirm時にstate同期させる。インスタンス化時の一回の呼び出しだけでよい
-        const updateState = (state) =>
-        {
-            const table_contents = this.table_values
-            for (let rowNum = 0; rowNum < table_contents.length; rowNum++)
-            {
-                const row = table_contents[rowNum];
-                row.forEach((element) =>
-                {
-                    const columnFieldcode = element.id;
-                    state.record[this.table_fieldcode].value[rowNum].value[
-                        columnFieldcode
-                    ].value = element.value;
-                });
-            }
-            return state;
-        }
-        // fb.events.fields[this.table_fieldcode].add.push(updateState)
-        // fb.events.fields[this.table_fieldcode].remove.push(updateState)
-        fb.events.form.confirm.push(updateState);
-    }
-
-    addEditButton()
-    {
-        this.modalId = `${this.table_fieldcode}`;
-        this.editButtonId = `${this.table_fieldcode}_editButton`;
-
-        if (document.getElementById(this.editButtonId) != undefined)
-        {
-            console.log("already exist")
-            return//既に存在していれば、追加しない
-        }
-
-        // ボタン要素を作成
-        const button = document.createElement("button");
-        button.setAttribute("type", "button");
-        button.setAttribute("class", "btn btn-primary");
-        button.textContent = "編集";
-        button.id = this.editButtonId;
-        // div要素を作成してボタンをラップ
-        const buttonWrapper = document.createElement("div");
-        buttonWrapper.setAttribute("class", "edit-button-wrapper");
-        buttonWrapper.style.marginLeft = "5%"; // 左側に10%のマージンを設定
-        buttonWrapper.appendChild(button);
-        // 編集ボタンを追加
-        this.table_dom.parentElement.parentElement.appendChild(buttonWrapper);
-
-        // ボタンがクリックされたときの処理を設定
-        // 追加のイベントを登録したい場合は、document.getElementById(this.editButtonId).addEventListener("click", () => { ... });
-        button.addEventListener("click", () =>
-        {
-            const modalElement = this.#makeModalDOM();
-            document.body.appendChild(modalElement); // bodyの末尾にモーダルを追加
-            $("#" + this.modalId).modal("show"); // モーダルを表示する
-            //modalが閉じられた時、modalを削除し、モーダルの中身をtableに反映させる
-            $("#" + this.modalId).on("hidden.bs.modal", () =>
-            {
-                const modalRowNumAndValue = this.getValuesFromModal();
-                this.setRowValuesToTable(
-                    modalRowNumAndValue.rowNum,
-                    modalRowNumAndValue.values
-                );
-
-                modalElement.remove(); //最後に実行
-            });
-        });
     }
 
     #makeModalDOM()
@@ -241,14 +105,14 @@ class FBTableModal
         {
             const pageButton = document.createElement("button");
             pageButton.setAttribute("type", "button");
-            pageButton.setAttribute("class", "btn btn-primary page-switch-button");
+            pageButton.setAttribute("class", "btn btn-outline-secondary page-switch-button");
             pageButton.textContent = `${i + 1}`;
             pageButton.setAttribute("data-page", i);
             if (i == rowNum)
             {
                 pageButton.setAttribute(
                     "class",
-                    "btn btn-secondary page-switch-button"
+                    "btn btn-primary page-switch-button"
                 );
                 pageButton.setAttribute("disabled", "true");
             } else
@@ -256,7 +120,7 @@ class FBTableModal
                 pageButton.addEventListener("click", () =>
                 {
                     const modalRowNumAndValue = this.getValuesFromModal();
-                    this.setRowValuesToTable(rowNum, modalRowNumAndValue.values);
+                    this.table_values[rowNum] = modalRowNumAndValue.values
                     this.#showPageContent(modalBody, i);
                 });
             }
@@ -265,16 +129,16 @@ class FBTableModal
         //追加ボタンを追加
         const addButton = document.createElement("button");
         addButton.setAttribute("type", "button");
-        addButton.setAttribute("class", "btn btn-primary");
-        addButton.style.backgroundColor = "green";
+        addButton.setAttribute("class", "btn btn-outline-primary");
         addButton.textContent = "追加";
         addButton.addEventListener("click", async () =>
         {
             const modalRowNumAndValue = this.getValuesFromModal();
-            this.setRowValuesToTable(rowNum, modalRowNumAndValue.values);
-            await this.addTableRow();
+            this.table_values[rowNum] = modalRowNumAndValue.values
             // this.#showPageContent(modalBody, this.tableContents.length - 1);
+            this.table_values.push(this.template_row_value)
             this.#showPageContent(modalBody, this.table_values.length - 1);
+            this.addTableRow();
         });
         pageButtonArea.appendChild(addButton);
 
@@ -292,13 +156,28 @@ class FBTableModal
             const inputDiv = document.createElement("div");
             inputDiv.setAttribute("class", "col-sm-9");
             const inputElement = document.createElement("input");
-            inputElement.setAttribute("type", "text");
             inputElement.setAttribute("class", "form-control");
             inputElement.setAttribute("id", input.id);
             inputElement.setAttribute("name", input.name);
-            for (const key in input.attribute)
-            {
-                inputElement.setAttribute(key, input.attribute[key]);
+            inputElement.setAttribute("type", "text");
+            if (this.attribute_obj != undefined && this.attribute_obj[input.id] != undefined)
+            {//attribute_obj内で指定されている場合、Attributeの設定を行う。
+                const keys = Object.keys(this.attribute_obj[input.id])
+                keys.forEach((key) =>
+                {
+                    if (key == "list")//datalist_idにはtable_fieldcodeが自動で前方付与されるため
+                        inputElement.setAttribute(key, `${this.table_fieldcode}_${this.attribute_obj[input.id][key]}`)
+                    else
+                        inputElement.setAttribute(key, this.attribute_obj[input.id][key])
+                })
+            }
+            if (this.listener_obj != undefined && this.listener_obj[input.id] != undefined)
+            {//listener_obj内で指定されている場合、EventListenerの設定を行う
+                const keys = Object.keys(this.listener_obj[input.id])
+                keys.forEach((key) =>
+                {
+                    inputElement.addEventListener(key, () => this.listener_obj[input.id][key](this))
+                })
             }
             inputElement.value = input.value;
             inputDiv.appendChild(inputElement);
@@ -307,23 +186,27 @@ class FBTableModal
 
         const deleteButton = document.createElement("button");
         deleteButton.setAttribute("type", "button");
-        deleteButton.setAttribute("class", "btn btn-primary");
-        deleteButton.style.backgroundColor = "orange";
+        deleteButton.setAttribute("class", "btn btn-danger");
         deleteButton.textContent = "削除";
         deleteButton.addEventListener("click", async () =>
-        {
-            // const modalContent = document.getElementById(`${this.modalId}_pageContent`);
-            // const targetRowNum = modalContent.getAttribute("rowNum");
-            // targetRowNum = rowNum
-            await this.deleteTableRow(rowNum);
-            // if (this.tableContents.length == 0)
-            if (this.table_values.length == 0)
+        { //削除イベント
+            if (this.table_values.length == 1)
             {
-                $("#" + this.modalId).modal("hide");
-            } else
+                // 削除せず初期化.
+                // table_valuesへの変更は$("#" + this.modalId).on("hidden.bs.modal", () => { })が行う
+                // modal内のinputを初期化するだけでいい
+                const modal_dom = document.getElementById(this.modalId)
+                const inputs = modal_dom.getElementsByTagName("input")
+                for (let i = 0; i < inputs.length; i++)
+                    inputs[i].value = ""
+                $("#" + this.modalId).modal("hide"); //modalを終了
+            }
+            else
             {
-                if (rowNum > 0) this.#showPageContent(modalBody, rowNum - 1);
-                else this.#showPageContent(modalBody, rowNum);
+                this.table_values.splice(rowNum, 1) //table_valuesを削除
+                if (rowNum > 0) this.#showPageContent(modalBody, rowNum - 1);  //消したrowの一個前を表示
+                else this.#showPageContent(modalBody, rowNum);//0を消した場合は、元1を表示
+                this.deleteTableRow(rowNum);
             }
         });
 
@@ -339,6 +222,171 @@ class FBTableModal
         pageContent.appendChild(document.createElement("hr"));
         pageContent.appendChild(deleteButtonArea)
         modalBody.appendChild(pageContent);
+    }
+
+    setDatalist(id, valueArray)  //idにはtable_fieldcodeが勝手に前方付与される
+    {
+        // 引数の形式が正しいことを確認
+        if (!Array.isArray(valueArray) || valueArray.length === 0 || id === undefined)
+        {
+            console.error("setDatalist関数の引数に誤りがあります。(id:str, valueArray:Arrat)")
+            return;
+        }
+
+        const datalist_id = `${this.table_fieldcode}_${id}`
+
+        // 二重で定義され内容に、過去のDOMがあれば自動削除
+        this.rmDatalist(datalist_id)
+
+        // datalist要素を作成
+        var dataList = document.createElement("datalist");
+        dataList.id = datalist_id
+
+        // dataObject.value配列からoption要素を作成してdatalistに追加
+        valueArray.forEach(function (value)
+        {
+            var option = document.createElement("option");
+            option.value = value;
+            dataList.appendChild(option);
+        });
+
+        // datalistをbodyに追加
+        document.body.appendChild(dataList);
+    }
+
+    rmDatalist(id)
+    {
+        const target = document.getElementById(id)
+        if (target != undefined)
+            target.remove()
+    }
+
+    #getTableContents()
+    {
+        //result=[[{id: fieldcode, name: 表示名, value:""}, {.}, ...]]
+        let result = [];
+        const ths = this.table_dom
+            .getElementsByTagName("table")[0]
+            .getElementsByTagName("thead")[0]
+            .getElementsByTagName("tr")[0]
+            .getElementsByTagName("th");
+        const tableBodyRows = this.table_dom
+            .getElementsByTagName("table")[0]
+            .getElementsByTagName("tbody")[0]
+            .getElementsByTagName("tr");
+        for (let rown = 0; rown < tableBodyRows.length; rown++)
+        {
+            let row = [];
+            const tds = tableBodyRows[rown].getElementsByTagName("td");
+            for (
+                let i = 0;
+                i < ths.length - 1;
+                i++ //ボタンの列を除外するため、-1
+            )
+            {
+                const name = ths[i].getElementsByTagName("label")[0].innerText;
+                const dataVvName = tds[i].firstChild.getAttribute("data-vv-name");
+                const id = dataVvName.split("-")[2];
+                const value = tds[i].firstChild.getElementsByTagName("input")[0].value;
+                row.push({ name: name, id: id, value: value });
+            }
+            result.push(row);
+        }
+        console.log("table data: ", result)
+        return result;
+    }
+
+    setTableVisible(is_visible)
+    {
+        if (is_visible) this.table_dom.style.display = ""; // 表示する
+        else this.table_dom.style.display = "none"; // 非表示にする
+    }
+
+    addTableRow()
+    {
+        this.table_dom
+            .getElementsByClassName("ui circular blue icon button")[0]
+            .click();
+    }
+
+    deleteTableRow(rowNum)
+    {
+        const targetRow = this.table_dom.getElementsByClassName(
+            "ui circular orange icon button"
+        )[rowNum];
+        if (targetRow == undefined)
+            console.error(`table ${this.table_fieldcode} has no row num=${rowNum}.`);
+        else
+        {
+            targetRow.click();
+        }
+    }
+
+    #setTableStateSync()
+    {
+        //table単位でconfirm時にstate同期させる。インスタンス化時の一回の呼び出しだけでよい
+        const updateState = (state) =>
+        {
+            const table_contents = this.table_values
+            for (let rowNum = 0; rowNum < table_contents.length; rowNum++)
+            {
+                const row = table_contents[rowNum];
+                row.forEach((element) =>
+                {
+                    const columnFieldcode = element.id;
+                    state.record[this.table_fieldcode].value[rowNum].value[
+                        columnFieldcode
+                    ].value = element.value;
+                });
+            }
+            return state;
+        }
+        // fb.events.fields[this.table_fieldcode].add.push(updateState)
+        // fb.events.fields[this.table_fieldcode].remove.push(updateState)
+        fb.events.form.confirm.push(updateState);
+    }
+
+    addEditButton()
+    {
+        this.modalId = `${this.table_fieldcode}`;
+        this.editButtonId = `${this.table_fieldcode}_editButton`;
+
+        if (document.getElementById(this.editButtonId) != undefined)
+        {
+            console.log("already exist")
+            return//既に存在していれば、追加しない
+        }
+
+        // ボタン要素を作成
+        const button = document.createElement("button");
+        button.setAttribute("type", "button");
+        button.setAttribute("class", "btn btn-primary");
+        button.textContent = "編集";
+        button.id = this.editButtonId;
+        // div要素を作成してボタンをラップ
+        const buttonWrapper = document.createElement("div");
+        buttonWrapper.setAttribute("class", "edit-button-wrapper");
+        buttonWrapper.style.marginLeft = "5%"; // 左側に10%のマージンを設定
+        buttonWrapper.appendChild(button);
+        // 編集ボタンを追加
+        this.table_dom.parentElement.parentElement.appendChild(buttonWrapper);
+
+        // ボタンがクリックされたときの処理を設定
+        // 追加のイベントを登録したい場合は、document.getElementById(this.editButtonId).addEventListener("click", () => { ... });
+        button.addEventListener("click", () =>
+        {
+            const modalElement = this.#makeModalDOM();
+            document.body.appendChild(modalElement); // bodyの末尾にモーダルを追加
+            $("#" + this.modalId).modal("show"); // モーダルを表示する
+            //modalが閉じられた時、modalを削除し、モーダルの中身をtableに反映させる
+            $("#" + this.modalId).on("hidden.bs.modal", () =>
+            {
+                const modalRowNumAndValue = this.getValuesFromModal();
+                this.table_values[modalRowNumAndValue.rowNum] = modalRowNumAndValue.values
+
+                modalElement.remove(); //最後に実行
+            });
+        });
     }
 
     getValuesFromModal()
