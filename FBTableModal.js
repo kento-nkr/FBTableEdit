@@ -2,17 +2,20 @@ class FBTableModal
 {
     table_fieldcode = "";
     table_dom;
+    add_button_dom;
     table_values = []  //[[{id: fieldcode, name: 表示名, value:""}, {.}, ...]]
     template_row_value = []
     attribute_obj = {} //{fieldcode:{attributeName:value, ...}, ... }
     listener_obj = {} //{fieldcode:{timing:function, ...}, ... }
+    max_len = null //max window len
 
-    constructor(table_fieldcode, attribute_obj, listener_obj)
+    constructor(table_fieldcode, attribute_obj, listener_obj, max_len = null)
     {
         this.#loadBootStrap();
         this.table_fieldcode = table_fieldcode;
         this.attribute_obj = attribute_obj
         this.listener_obj = listener_obj
+        this.max_len = max_len
         this.table_dom = document.querySelector(
             `[data-vv-name="${this.table_fieldcode}"]`
         );
@@ -136,11 +139,14 @@ class FBTableModal
             const modalRowNumAndValue = this.getValuesFromModal();
             this.table_values[rowNum] = modalRowNumAndValue.values
             // this.#showPageContent(modalBody, this.tableContents.length - 1);
+            if (this.check_addable() == false) return
             this.table_values.push(this.template_row_value)
             this.#showPageContent(modalBody, this.table_values.length - 1);
             this.addTableRow();
         });
         pageButtonArea.appendChild(addButton);
+        this.add_button_dom = addButton
+        this.check_addable()
 
         // const targetTableContent = this.tableContents[rowNum];
         const targetTableContent = this.table_values[rowNum];
@@ -203,10 +209,12 @@ class FBTableModal
             }
             else
             {
+                this.check_addable()
                 this.table_values.splice(rowNum, 1) //table_valuesを削除
                 if (rowNum > 0) this.#showPageContent(modalBody, rowNum - 1);  //消したrowの一個前を表示
                 else this.#showPageContent(modalBody, rowNum);//0を消した場合は、元1を表示
                 this.deleteTableRow(rowNum);
+
             }
         });
 
@@ -222,6 +230,21 @@ class FBTableModal
         pageContent.appendChild(document.createElement("hr"));
         pageContent.appendChild(deleteButtonArea)
         modalBody.appendChild(pageContent);
+    }
+
+    check_addable()
+    {
+        if (this.max_len != null)
+        {
+            const window_num = this.table_values.length
+            if (window_num >= this.max_len)
+            {
+                this.add_button_dom.disabled = true;
+                return false
+            }
+        }
+        this.add_button_dom.disabled = false;
+        return true
     }
 
     setDatalist(id, valueArray)  //idにはtable_fieldcodeが勝手に前方付与される

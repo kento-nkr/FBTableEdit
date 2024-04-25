@@ -16,8 +16,14 @@
 2. classのインスタンスを作成
 
     ```js
-    const インスタンス名 = new FBTableModal("テーブルのフィールドコード", <option: Attributeの設定オブジェクト>, <option: EventListenerの設定オブジェクト>)
+    const インスタンス名 = new FBTableModal("テーブルのフィールドコード", <option: Attributeの設定オブジェクト>, <option: EventListenerの設定オブジェクト>, <option: windowの最大枚数>)
     ```
+
+    ### 引数
+    - 1: "テーブルのフィールドコード"
+    - 2: <option: Attributeの設定オブジェクト>
+    - 3: <option: EventListenerの設定オブジェクト>
+    - 4: <option: windowの最大枚数>
 
 3. Attributeの設定オブジェクト
 
@@ -84,7 +90,8 @@ function allScriptsLoaded()
     const emergency_list = new FBTableModal(
         "緊急連絡先_0",
         emergency_list_attribute_obj,
-        emergency_list_listener_obj
+        emergency_list_listener_obj, 
+        3
     )   //classのインスタンスを作成。自動でボタン設置やテーブル非表示などが実行される
     emergency_list.setDatalist("relationship", ["本人", "子供", "親"])  //datalistを設置
 }
