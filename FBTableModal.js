@@ -9,7 +9,7 @@ class FBTableModal
     listener_obj = {} //{fieldcode:{timing:function, ...}, ... }
     max_len = null //max window len
 
-    constructor(table_fieldcode, attribute_obj, listener_obj, max_len = null)
+    constructor(table_fieldcode, attribute_obj = {}, listener_obj = {}, max_len = null)
     {
         this.#loadBootStrap();
         this.table_fieldcode = table_fieldcode;
