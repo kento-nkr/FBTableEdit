@@ -16,33 +16,55 @@
 2. classのインスタンスを作成
 
     ```js
-    const インスタンス名 = new FBTableModal("テーブルのフィールドコード", <option: Attributeの設定オブジェクト>, <option: EventListenerの設定オブジェクト>, <option: windowの最大枚数>)
+    const インスタンス名 = new FBTableModal(
+        "テーブルのフィールドコード",
+        <option: Attributeの設定オブジェクト>,
+        <option: EventListenerの設定オブジェクト>,
+        <option: windowの最大枚数>
+    )
     ```
 
     ### 引数
     - 1: 必須：<テーブルのフィールドコード> :string
     - 2: オプション：<Attributeの設定オブジェクト>:Object
+        - defaultは`{}`
     - 3: オプション：<EventListenerの設定オブジェクト>:Object
+        - defaultは`{}`
     - 4: オプション：<windowの最大枚数>:number
-        - 無制限の場合は`null`を指定  
+        - 無制限の場合は`null`を指定
+        - defaultは`null`
+  
+    - オプションなしでインスタンス化する場合は
+        ```js
+        const インスタンス名 = new FBTableModal("テーブルのフィールドコード")
+        // 第2,3,4引数はdefault値でインスタンス化される
+        ```
 
 3. Attributeの設定オブジェクト
 
     ```js
-    {fieldcode:{attributeName:value, ...}, ... }
+    {
+        fieldcode : {
+            attributeName:value,
+            ...
+        },
+        ...
+    }
     ```
 
     の形式。以下が例
 
     ```js
      const attribute_obj = {
-        電話番号: {
+        電話番号 : {
             autocomplete: "tel",
             inputmode: "tel",
             placeholder: "ハイフンは自動挿入されます",
         },
     }
     ```
+
+    `attributeName`は[こちら](https://developer.mozilla.org/ja/docs/Web/HTML/Attributes)を参照
 
 4. EventListenerの設定オブジェクト
 
@@ -61,14 +83,16 @@
     }
     ```
 
+    `timing`は[こちら](https://web-designer.cman.jp/javascript_ref/event_list/)を参照
+
 5. datalistの設定
     ```js
     FBTableModalInstance.setDatalist("relationship", ["本人", "子供", "親"])  //datalistを設置
     ```
     FBTableModalInstanceのインスタンス内の、setDatalistメソッドを使用。  
-    引数は、
-    - Attributeでlistとして追加したid
-    - 選択肢の配列
+    ### 引数
+    - 1: Attributeでlistとして追加した`id`: string
+    - 2: 選択肢の配列: Array
 
 ## サンプルプログラム
 
