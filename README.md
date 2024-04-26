@@ -20,10 +20,11 @@
     ```
 
     ### 引数
-    - 1: "テーブルのフィールドコード"
-    - 2: <option: Attributeの設定オブジェクト>
-    - 3: <option: EventListenerの設定オブジェクト>
-    - 4: <option: windowの最大枚数>
+    - 1: 必須：<テーブルのフィールドコード> :string
+    - 2: オプション：<Attributeの設定オブジェクト>:Object
+    - 3: オプション：<EventListenerの設定オブジェクト>:Object
+    - 4: オプション：<windowの最大枚数>:number
+        - 無制限の場合は`null`を指定  
 
 3. Attributeの設定オブジェクト
 
