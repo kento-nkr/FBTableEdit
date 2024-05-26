@@ -62,6 +62,7 @@
        autocomplete: "tel",
        inputmode: "tel",
        placeholder: "ハイフンは自動挿入されます",
+       initial: "初期値"
      },
    };
    ```
