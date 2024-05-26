@@ -4,126 +4,135 @@
 
 ## 使い方
 
-1. formのdom生成が終わるまで待機
+1. form の dom 生成が終わるまで待機
 
-    ```js
-        document.addEventListener("DOMContentLoaded", function (event){
-            // すべてのスクリプトがロードされた後に実行
-            your_function();
-        });
-    ```
+   ```js
+   document.addEventListener("DOMContentLoaded", function (event) {
+     // すべてのスクリプトがロードされた後に実行
+     your_function();
+   });
+   ```
 
-2. classのインスタンスを作成
+2. class のインスタンスを作成
 
-    ```js
-    const インスタンス名 = new FBTableModal(
-        "テーブルのフィールドコード",
-        <option: Attributeの設定オブジェクト>,
-        <option: EventListenerの設定オブジェクト>,
-        <option: windowの最大枚数>
-    )
-    ```
+   ```js
+   const インスタンス名 = new FBTableModal(
+       "テーブルのフィールドコード",
+       <option: Attributeの設定オブジェクト>,
+       <option: EventListenerの設定オブジェクト>,
+       <option: windowの最大枚数>
+   )
+   ```
 
-    ### 引数
-    - 1: 必須：<テーブルのフィールドコード> :string
-    - 2: オプション：<Attributeの設定オブジェクト>:Object
-        - defaultは`{}`
-    - 3: オプション：<EventListenerの設定オブジェクト>:Object
-        - defaultは`{}`
-    - 4: オプション：<windowの最大枚数>:number
-        - 無制限の場合は`null`を指定
-        - defaultは`null`
-  
-    - オプションなしでインスタンス化する場合は
-        ```js
-        const インスタンス名 = new FBTableModal("テーブルのフィールドコード")
-        // 第2,3,4引数はdefault値でインスタンス化される
-        ```
+   ### 引数
 
-3. Attributeの設定オブジェクト
+   - 1: 必須：<テーブルのフィールドコード> :string
+   - 2: オプション：<Attribute の設定オブジェクト>:Object
+     - default は`{}`
+   - 3: オプション：<EventListener の設定オブジェクト>:Object
+     - default は`{}`
+   - 4: オプション：<window の最大枚数>:number
 
-    ```js
-    {
-        fieldcode : {
-            attributeName:value,
-            ...
-        },
-        ...
-    }
-    ```
+     - 無制限の場合は`null`を指定
+     - default は`null`
 
-    の形式。以下が例
+   - オプションなしでインスタンス化する場合は
+     ```js
+     const インスタンス名 = new FBTableModal("テーブルのフィールドコード");
+     // 第2,3,4引数はdefault値でインスタンス化される
+     ```
 
-    ```js
-     const attribute_obj = {
-        電話番号 : {
-            autocomplete: "tel",
-            inputmode: "tel",
-            placeholder: "ハイフンは自動挿入されます",
-        },
-    }
-    ```
+3. Attribute の設定オブジェクト
 
-    `attributeName`は[こちら](https://developer.mozilla.org/ja/docs/Web/HTML/Attributes)を参照
+   ```js
+   {
+       fieldcode : {
+           attributeName:value,
+           ...
+       },
+       ...
+   }
+   ```
 
-4. EventListenerの設定オブジェクト
+   の形式。以下が例
 
-    ```js
-    {fieldcode:{timing:function, ...}, ... }
-    ```
+   ```js
+   const attribute_obj = {
+     電話番号: {
+       autocomplete: "tel",
+       inputmode: "tel",
+       placeholder: "ハイフンは自動挿入されます",
+     },
+   };
+   ```
 
-    の形式。以下が例
+   `attributeName`は[こちら](https://developer.mozilla.org/ja/docs/Web/HTML/Attributes)を参照
 
-    ```js
-    const listener_obj = {
-        電話番号: {
-            // 設定した関数には、引数として設定に使用したFBTableModalのインスタンスが渡される。
-            input: (FBTableModal) => { console.log(FBTableModal.modalId) }
-        }
-    }
-    ```
+   - original attribute
+     - `initial`: input dom の初期値
 
-    `timing`は[こちら](https://web-designer.cman.jp/javascript_ref/event_list/)を参照
+4. EventListener の設定オブジェクト
 
-5. datalistの設定
-    ```js
-    FBTableModalInstance.setDatalist("relationship", ["本人", "子供", "親"])  //datalistを設置
-    ```
-    FBTableModalInstanceのインスタンス内の、setDatalistメソッドを使用。  
-    ### 引数
-    - 1: Attributeでlistとして追加した`id`: string
-    - 2: 選択肢の配列: Array
+   ```js
+   {fieldcode:{timing:function, ...}, ... }
+   ```
+
+   の形式。以下が例
+
+   ```js
+   const listener_obj = {
+     電話番号: {
+       // 設定した関数には、引数として設定に使用したFBTableModalのインスタンスが渡される。
+       input: (FBTableModal) => {
+         console.log(FBTableModal.modalId);
+       },
+     },
+   };
+   ```
+
+   `timing`は[こちら](https://web-designer.cman.jp/javascript_ref/event_list/)を参照
+
+5. datalist の設定
+   ```js
+   FBTableModalInstance.setDatalist("relationship", ["本人", "子供", "親"]); //datalistを設置
+   ```
+   FBTableModalInstance のインスタンス内の、setDatalist メソッドを使用。
+   ### 引数
+   - 1: Attribute で list として追加した`id`: string
+   - 2: 選択肢の配列: Array
 
 ## サンプルプログラム
 
 ```js
-function allScriptsLoaded()
-{   // すべてのスクリプトがロードされた後に実行される関数
-    const emergency_list_attribute_obj = {
-        電話番号: {
-            autocomplete: "tel",
-            inputmode: "tel",
-            placeholder: "ハイフンは自動挿入されます",
-        },
-    }   //attributeの設定object
-    const emergency_list_listener_obj = {
-        電話番号: {
-            // 設定した関数には、引数として設定に使用したFBTableModalのインスタンスが渡される。
-            input: (FBTableModal) => { console.log(FBTableModal.modalId) }
-        }
-    }   //イベントリスナーの設定object
-    const emergency_list = new FBTableModal(
-        "緊急連絡先_0",
-        emergency_list_attribute_obj,
-        emergency_list_listener_obj, 
-        3
-    )   //classのインスタンスを作成。自動でボタン設置やテーブル非表示などが実行される
-    emergency_list.setDatalist("relationship", ["本人", "子供", "親"])  //datalistを設置
+function allScriptsLoaded() {
+  // すべてのスクリプトがロードされた後に実行される関数
+  const emergency_list_attribute_obj = {
+    電話番号: {
+      autocomplete: "tel",
+      inputmode: "tel",
+      placeholder: "ハイフンは自動挿入されます",
+    },
+  }; //attributeの設定object
+  const emergency_list_listener_obj = {
+    電話番号: {
+      // 設定した関数には、引数として設定に使用したFBTableModalのインスタンスが渡される。
+      input: (FBTableModal) => {
+        console.log(FBTableModal.modalId);
+      },
+    },
+  }; //イベントリスナーの設定object
+  const emergency_list = new FBTableModal(
+    "緊急連絡先_0",
+    emergency_list_attribute_obj,
+    emergency_list_listener_obj,
+    3
+  ); //classのインスタンスを作成。自動でボタン設置やテーブル非表示などが実行される
+  emergency_list.setDatalist("relationship", ["本人", "子供", "親"]); //datalistを設置
 }
 
-document.addEventListener("DOMContentLoaded", () =>
-{// DOMContentLoadedイベントのリスナーを追加
-    allScriptsLoaded(); // すべてのスクリプトがロードされた後にallScriptsLoaded関数を実行
+document.addEventListener("DOMContentLoaded", () => {
+  // DOMContentLoadedイベントのリスナーを追加
+  allScriptsLoaded(); // すべてのスクリプトがロードされた後にallScriptsLoaded関数を実行
 });
 ```
 
@@ -131,21 +140,21 @@ document.addEventListener("DOMContentLoaded", () =>
 
 <details><summary>編集ボタンの表示位置がおかしな場合</summary>
 
-### FormBridgeのフィールド配置の問題です
+### FormBridge のフィールド配置の問題です
 
-編集ボタンのDOMは、元のテーブルのあったDOMの、親のDOMの末尾に追加されます
+編集ボタンの DOM は、元のテーブルのあった DOM の、親の DOM の末尾に追加されます
 
 ```js
-    this.table_dom.parentElement.parentElement.appendChild(buttonWrapper);
+this.table_dom.parentElement.parentElement.appendChild(buttonWrapper);
 ```
 
-1. FormBridgeのコンソール画面を開き、「フォームのデザイン」を選択
+1. FormBridge のコンソール画面を開き、「フォームのデザイン」を選択
 
-    <img width="214" alt="image" src="https://github.com/kento-nkr/FBTableModal/assets/127807502/eb52bee1-306c-4fbc-ab1b-9370dafd5ff1">
+<img width="214" alt="image" src="https://github.com/kento-nkr/FBTableModal/assets/127807502/eb52bee1-306c-4fbc-ab1b-9370dafd5ff1">
 
 2. 該当テーブルまで行き、以下の条件を満たすようにフィールドをドラッグして動かす
 
-    ![FBTableEdit ボタン配置の説明](https://github.com/kento-nkr/FBTableModal/assets/127807502/ec72eaf0-415c-477f-bdce-837f677e9398)
+   ![FBTableEdit ボタン配置の説明](https://github.com/kento-nkr/FBTableModal/assets/127807502/ec72eaf0-415c-477f-bdce-837f677e9398)
 
 </details>
 

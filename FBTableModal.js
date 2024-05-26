@@ -51,6 +51,7 @@ class FBTableModal {
       );
     this.#setTableStateSync();
     this.addEditButton();
+    this.addRecordNumLabel();
     this.setTableVisible(false);
   }
 
@@ -173,12 +174,13 @@ class FBTableModal {
       inputElement.setAttribute("id", input.id);
       inputElement.setAttribute("name", input.name);
       inputElement.setAttribute("type", "text");
+      inputElement.value = input.value;
       if (
         this.attribute_obj != undefined &&
         this.attribute_obj[input.id] != undefined
       ) {
-        //attribute_obj内で指定されている場合、Attributeの設定を行う。
         const keys = Object.keys(this.attribute_obj[input.id]);
+        //attribute_obj内で指定されている場合、Attributeの設定を行う。
         keys.forEach((key) => {
           if (key == "list")
             //datalist_idにはtable_fieldcodeが自動で前方付与されるため
@@ -186,7 +188,9 @@ class FBTableModal {
               key,
               `${this.table_fieldcode}_${this.attribute_obj[input.id][key]}`
             );
-          else
+          else if (key == "initial") {
+            inputElement.value = this.attribute_obj[input.id][key];
+          } else
             inputElement.setAttribute(key, this.attribute_obj[input.id][key]);
         });
       }
@@ -202,7 +206,6 @@ class FBTableModal {
           );
         });
       }
-      inputElement.value = input.value;
       inputDiv.appendChild(inputElement);
       pageFormArea.appendChild(inputDiv);
     });
@@ -213,34 +216,56 @@ class FBTableModal {
     deleteButton.textContent = "削除";
     deleteButton.addEventListener("click", async () => {
       //削除イベント
-      if (this.table_values.length == 1) {
-        // 削除せず初期化.
-        // table_valuesへの変更は$("#" + this.modalId).on("hidden.bs.modal", () => { })が行う
-        // modal内のinputを初期化するだけでいい
-        const modal_dom = document.getElementById(this.modalId);
-        const inputs = modal_dom.getElementsByTagName("input");
-        for (let i = 0; i < inputs.length; i++) inputs[i].value = "";
-        $("#" + this.modalId).modal("hide"); //modalを終了
-      } else {
-        this.check_addable();
-        this.table_values.splice(rowNum, 1); //table_valuesを削除
-        if (rowNum > 0) this.#showPageContent(modalBody, rowNum - 1);
-        //消したrowの一個前を表示
-        else this.#showPageContent(modalBody, rowNum); //0を消した場合は、元1を表示
-        this.deleteTableRow(rowNum);
+      if (confirm("削除してもよろしいですか？")) {
+        if (this.table_values.length == 1) {
+          // 削除せず初期化.
+          // table_valuesへの変更は$("#" + this.modalId).on("hidden.bs.modal", () => { })が行う
+          // modal内のinputを初期化するだけでいい
+          const modal_dom = document.getElementById(this.modalId);
+          const inputs = modal_dom.getElementsByTagName("input");
+          for (let i = 0; i < inputs.length; i++) inputs[i].value = "";
+          document.getElementById(
+            `${this.modalId}_recordNumLabel`
+          ).textContent = "レコード数: 0件";
+          $("#" + this.modalId).modal("hide"); //modalを終了
+        } else {
+          this.check_addable();
+          this.table_values.splice(rowNum, 1); //table_valuesを削除
+          if (rowNum > 0) this.#showPageContent(modalBody, rowNum - 1);
+          //消したrowの一個前を表示
+          else this.#showPageContent(modalBody, rowNum); //0を消した場合は、元1を表示
+          this.deleteTableRow(rowNum);
+        }
       }
     });
 
-    // div要素を作成してボタンをラップし、中央揃えのスタイルを適用する
-    const deleteButtonArea = document.createElement("div");
-    deleteButtonArea.style.textAlign = "center"; // ボタンを中央に配置する
-    deleteButtonArea.appendChild(deleteButton);
+    const resisterButton = document.createElement("button");
+    resisterButton.setAttribute("type", "button");
+    resisterButton.setAttribute("class", "btn btn-primary");
+    resisterButton.textContent = "登録";
+    resisterButton.addEventListener("click", async () => {
+      const modalRowNumAndValue = this.getValuesFromModal();
+      this.table_values[rowNum] = modalRowNumAndValue.values;
+      document.getElementById(
+        `${this.table_fieldcode}_recordNumLabel`
+      ).textContent = `レコード数: ${this.table_values.length}件`;
+      $("#" + this.modalId).modal("hide"); //modalを終了
+    });
+
+    // hooterを作成し、削除ボタンと登録ボタンを追加. ボタン間はmarginを追加
+    deleteButton.style.marginRight = "5px";
+    resisterButton.style.marginRight = "5px";
+    const hooter = document.createElement("div");
+    hooter.appendChild(deleteButton);
+    hooter.appendChild(resisterButton);
+    hooter.style.textAlign = "center";
 
     pageContent.appendChild(pageButtonArea);
     pageContent.appendChild(document.createElement("hr"));
     pageContent.appendChild(pageFormArea);
     pageContent.appendChild(document.createElement("hr"));
-    pageContent.appendChild(deleteButtonArea);
+    pageContent.appendChild(hooter);
+
     modalBody.appendChild(pageContent);
   }
 
@@ -412,6 +437,16 @@ class FBTableModal {
         modalElement.remove(); //最後に実行
       });
     });
+  }
+
+  addRecordNumLabel() {
+    const recordNumLabel = document.createElement("label");
+    recordNumLabel.setAttribute("class", "record-num-label");
+    recordNumLabel.style.display = "block"; // ブロック要素に設定
+    recordNumLabel.setAttribute("id", `${this.table_fieldcode}_recordNumLabel`);
+    recordNumLabel.style.marginLeft = "5%"; // 左側に10%のマージンを設定
+    recordNumLabel.textContent = `レコード数: ${this.table_values.length}件`;
+    this.table_dom.parentElement.parentElement.appendChild(recordNumLabel);
   }
 
   getValuesFromModal() {
