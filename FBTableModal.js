@@ -256,8 +256,8 @@ class FBTableModal {
     deleteButton.style.marginRight = "5px";
     resisterButton.style.marginRight = "5px";
     const hooter = document.createElement("div");
-    hooter.appendChild(deleteButton);
     hooter.appendChild(resisterButton);
+    hooter.appendChild(deleteButton);
     hooter.style.textAlign = "center";
 
     pageContent.appendChild(pageButtonArea);
