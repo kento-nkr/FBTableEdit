@@ -151,6 +151,9 @@ class FBTableModal {
       if (this.check_addable() == false) return;
       this.table_values.push(this.template_row_value);
       this.#showPageContent(modalBody, this.table_values.length - 1);
+      document.getElementById(
+        `${this.table_fieldcode}_recordNumLabel`
+      ).textContent = `レコード数: ${this.get_record_num()}件`;
       this.addTableRow();
     });
     pageButtonArea.appendChild(addButton);
@@ -225,7 +228,7 @@ class FBTableModal {
           const inputs = modal_dom.getElementsByTagName("input");
           for (let i = 0; i < inputs.length; i++) inputs[i].value = "";
           document.getElementById(
-            `${this.modalId}_recordNumLabel`
+            `${this.table_fieldcode}_recordNumLabel`
           ).textContent = "レコード数: 0件";
           $("#" + this.modalId).modal("hide"); //modalを終了
         } else {
@@ -235,6 +238,9 @@ class FBTableModal {
           //消したrowの一個前を表示
           else this.#showPageContent(modalBody, rowNum); //0を消した場合は、元1を表示
           this.deleteTableRow(rowNum);
+          document.getElementById(
+            `${this.table_fieldcode}_recordNumLabel`
+          ).textContent = `レコード数: ${this.get_record_num()}件`;
         }
       }
     });
@@ -248,7 +254,7 @@ class FBTableModal {
       this.table_values[rowNum] = modalRowNumAndValue.values;
       document.getElementById(
         `${this.table_fieldcode}_recordNumLabel`
-      ).textContent = `レコード数: ${this.table_values.length}件`;
+      ).textContent = `レコード数: ${this.get_record_num()}件`;
       $("#" + this.modalId).modal("hide"); //modalを終了
     });
 
@@ -353,7 +359,7 @@ class FBTableModal {
         result.push(row);
       }
       console.log("table data: ", result);
-    } catch (error) {}
+    } catch (error) { }
     return result;
   }
 
@@ -445,8 +451,21 @@ class FBTableModal {
     recordNumLabel.style.display = "block"; // ブロック要素に設定
     recordNumLabel.setAttribute("id", `${this.table_fieldcode}_recordNumLabel`);
     recordNumLabel.style.marginLeft = "5%"; // 左側に10%のマージンを設定
-    recordNumLabel.textContent = `レコード数: ${this.table_values.length}件`;
+    recordNumLabel.textContent = `レコード数: ${this.get_record_num()}件`;
     this.table_dom.parentElement.parentElement.appendChild(recordNumLabel);
+  }
+
+  get_record_num() {
+    //全フィールドのvalue==""の場合は0としてカウントしない
+    let record_num = 0;
+    this.table_values.forEach((row) => {
+      let is_empty = true;
+      row.forEach((elem) => {
+        if (elem.value != "") is_empty = false;
+      });
+      if (is_empty == false) record_num++;
+    });
+    return record_num;
   }
 
   getValuesFromModal() {
