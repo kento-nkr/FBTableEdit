@@ -418,7 +418,7 @@ class FBTableModal {
     const button = document.createElement("button");
     button.setAttribute("type", "button");
     button.setAttribute("class", "btn btn-primary");
-    button.textContent = "編集";
+    button.textContent = "編集する";
     button.id = this.editButtonId;
     // div要素を作成してボタンをラップ
     const buttonWrapper = document.createElement("div");
