@@ -40,11 +40,11 @@ class FBTableModal {
   }
 
   #completeInit() {
-    //    this.table_values[0].forEach((elem) => {
-    //      let write_elem = elem;
-    //      write_elem.value = "";
-    //      this.template_row_value.push(write_elem);
-    //    });
+    this.table_values[0].forEach((elem) => {
+      let write_elem = elem;
+      //      write_elem.value = "";
+      this.template_row_value.push(write_elem);
+    });
     if (this.table_dom == undefined)
       console.error(
         `fieldcode=${table_fieldcode} is not defined as Table element. Please check your FB setting.`
