@@ -42,7 +42,7 @@ class FBTableModal {
   #completeInit() {
     this.table_values[0].forEach((elem) => {
       let write_elem = elem;
-      write_elem.value = "";
+      //      write_elem.value = "";
       this.template_row_value.push(write_elem);
     });
     if (this.table_dom == undefined)
