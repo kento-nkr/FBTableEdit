@@ -24,7 +24,9 @@ class FBTableModal {
     );
     this.table_values = this.#getTableContents();
 
-    if (this.table_values.length < 1) {
+    const table_len = this.table_values.length;    
+    const elem1_value = this.table_values[table_len - 1][0].value;
+    if ((this.table_values.length < 1) || (elem1_value != "")) {
       console.log(
         `fieldcode=${table_fieldcode} have no row. We can get content template.\nPlease wait a moment.`
       );
@@ -40,9 +42,10 @@ class FBTableModal {
   }
 
   #completeInit() {
-    this.table_values[0].forEach((elem) => {
+    const table_len = this.table_values.length;    
+    this.table_values[table_len-1].forEach((elem) => {
       let write_elem = elem;
-      //      write_elem.value = "";
+      write_elem.value = "";
       this.template_row_value.push(write_elem);
     });
     if (this.table_dom == undefined)
