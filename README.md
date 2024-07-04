@@ -72,7 +72,24 @@
    - original attribute
      - `initial`: input dom の初期値
 
-4. EventListener の設定オブジェクト
+   - hhidden属性のサポート
+      - inputフィールドだけでなく、labelも非表示
+
+   ```js
+   const attribute_obj = {
+      片道距離: { hidden: "" },
+   }
+   ```
+
+   <p align="center">
+     <img src="https://github.com/kento-nkr/FBTableModal/assets/127807502/c316decf-0e8a-4a3e-9bee-9eb1c7d64119" width="45%" />
+     <img src="https://github.com/kento-nkr/FBTableModal/assets/127807502/f28a08e0-1fe5-47b4-948c-aed962308a14" width="45%" />
+   </p>
+
+
+
+
+5. EventListener の設定オブジェクト
 
    ```js
    {fieldcode:{timing:function, ...}, ... }
@@ -93,7 +110,7 @@
 
    `timing`は[こちら](https://web-designer.cman.jp/javascript_ref/event_list/)を参照
 
-5. datalist の設定
+6. datalist の設定
    ```js
    FBTableModalInstance.setDatalist("relationship", ["本人", "子供", "親"]); //datalistを設置
    ```
