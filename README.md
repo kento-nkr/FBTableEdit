@@ -110,7 +110,7 @@
 
    `timing`は[こちら](https://web-designer.cman.jp/javascript_ref/event_list/)を参照
 
-3. datalist の設定**（非推奨）**
+5. datalist の設定
    ```js
    FBTableModalInstance.setDatalist("relationship", ["本人", "子供", "親"]); //datalistを設置
    ```
@@ -120,7 +120,8 @@
    - 2: 選択肢の配列: Array
 
 ## サンプルプログラム
-
+- [運用中コード](https://github.com/NKR-24/FB_415358)
+  
 ```js
 function allScriptsLoaded() {
   // すべてのスクリプトがロードされた後に実行される関数
