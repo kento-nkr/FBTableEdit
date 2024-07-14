@@ -24,9 +24,10 @@ class FBTableModal {
     );
     this.table_values = this.#getTableContents();
 
-    const table_len = this.table_values.length;    
+    console.log("table_values: ", this.table_values);
+    const table_len = this.table_values.length;
     const elem1_value = this.table_values[table_len - 1][0].value;
-    if ((this.table_values.length < 1) || (elem1_value != "")) {
+    if (this.table_values.length < 1 || elem1_value != "") {
       console.log(
         `fieldcode=${table_fieldcode} have no row. We can get content template.\nPlease wait a moment.`
       );
@@ -42,8 +43,8 @@ class FBTableModal {
   }
 
   #completeInit() {
-    const table_len = this.table_values.length;    
-    this.table_values[table_len-1].forEach((elem) => {
+    const table_len = this.table_values.length;
+    this.table_values[table_len - 1].forEach((elem) => {
       let write_elem = elem;
       write_elem.value = "";
       this.template_row_value.push(write_elem);
@@ -168,18 +169,32 @@ class FBTableModal {
 
     // ページの入力フィールドを表示
     targetTableContent.forEach((input) => {
+      // attributeでhiddenが指定されている場合は表示しない
+      if (this.attribute_obj[input.id] != undefined) {
+        const keys = Object.keys(this.attribute_obj[input.id]);
+        if (keys.includes("hidden")) return;
+      }
+      const is_select =
+        this.attribute_obj[input.id] != undefined &&
+        Object.keys(this.attribute_obj[input.id]).includes("select"); //datalistを使用する場合
+
       const labelElement = document.createElement("label");
       labelElement.setAttribute("class", "col-sm-6 col-form-label");
       labelElement.textContent = input.name;
       pageFormArea.appendChild(labelElement);
-
       const inputDiv = document.createElement("div");
       inputDiv.setAttribute("class", "col-sm-9");
-      const inputElement = document.createElement("input");
+
+      let inputElement;
+      if (is_select) {
+        inputElement = document.createElement("select");
+      } else {
+        inputElement = document.createElement("input");
+        inputElement.setAttribute("type", "text");
+      }
       inputElement.setAttribute("class", "form-control");
       inputElement.setAttribute("id", input.id);
       inputElement.setAttribute("name", input.name);
-      inputElement.setAttribute("type", "text");
       inputElement.value = input.value;
       if (
         this.attribute_obj != undefined &&
@@ -188,16 +203,26 @@ class FBTableModal {
         const keys = Object.keys(this.attribute_obj[input.id]);
         //attribute_obj内で指定されている場合、Attributeの設定を行う。
         keys.forEach((key) => {
+          const value = this.attribute_obj[input.id][key];
           if (key == "list")
-            //datalist_idにはtable_fieldcodeが自動で前方付与されるため
-            inputElement.setAttribute(
-              key,
-              `${this.table_fieldcode}_${this.attribute_obj[input.id][key]}`
-            );
-          else if (key == "initial") {
-            inputElement.value = this.attribute_obj[input.id][key];
-          } else
-            inputElement.setAttribute(key, this.attribute_obj[input.id][key]);
+            // datalist_idにはtable_fieldcodeが自動で前方付与されるため
+            inputElement.setAttribute(key, `${this.table_fieldcode}_${value}`);
+          else if (key == "select") {
+            // optionsタグを追加
+            const selectValues = value;
+            const initial_option = document.createElement("option");
+            initial_option.value = "";
+            initial_option.textContent = "選択してください";
+            inputElement.appendChild(initial_option);
+            value.forEach((selectValue) => {
+              const option = document.createElement("option");
+              option.value = selectValue;
+              option.textContent = selectValue;
+              inputElement.appendChild(option);
+            });
+          } else if (key == "initial") {
+            inputElement.value = value;
+          } else inputElement.setAttribute(key, value);
         });
       }
       if (
@@ -212,6 +237,7 @@ class FBTableModal {
           );
         });
       }
+      inputElement.value = input.value; //selectタグはoptionの設定後にvalueを設定する
       inputDiv.appendChild(inputElement);
       pageFormArea.appendChild(inputDiv);
     });
@@ -343,6 +369,7 @@ class FBTableModal {
       .getElementsByTagName("table")[0]
       .getElementsByTagName("tbody")[0]
       .getElementsByTagName("tr");
+
     try {
       for (let rown = 0; rown < tableBodyRows.length; rown++) {
         let row = [];
@@ -355,14 +382,24 @@ class FBTableModal {
           const name = ths[i].getElementsByTagName("label")[0].innerText;
           const dataVvName = tds[i].firstChild.getAttribute("data-vv-name");
           const id = dataVvName.split("-")[2];
-          const value =
-            tds[i].firstChild.getElementsByTagName("input")[0].value;
+          let input_field = tds[i].firstChild.getElementsByTagName("input");
+          let value = "";
+          if (input_field.length == 0) {
+            //buttonの場合
+            input_field = tds[i].firstChild.getElementsByTagName("button");
+            value = input_field[0].getElementsByTagName("div")[0].innerText;
+          } else {
+            value = tds[i].firstChild.getElementsByTagName("input")[0].value;
+          }
           row.push({ name: name, id: id, value: value });
         }
         result.push(row);
       }
-      console.log("table data: ", result);
-    } catch (error) { }
+    } catch (error) {
+      console.error(
+        `table ${this.table_fieldcode} has no data. Please check your setting.\nerror message: ${error}`
+      );
+    }
     return result;
   }
 
@@ -476,9 +513,9 @@ class FBTableModal {
     const modalContent = document.getElementById(`${this.modalId}_pageContent`);
     result.rowNum = modalContent.getAttribute("rowNum");
     result.values = [];
-    const inputElements = modalContent.getElementsByTagName("input");
-    for (let i = 0; i < inputElements.length; i++) {
-      const input = inputElements[i];
+    const elements = modalContent.getElementsByClassName("form-control");
+    for (let i = 0; i < elements.length; i++) {
+      const input = elements[i];
       const id = input.getAttribute("id"); // 入力フィールドのIDを取得
       const name = input.getAttribute("name"); // 入力フィールドのnameを取得
       const value = input.value; // 入力フィールドの値を取得

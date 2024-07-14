@@ -24,7 +24,16 @@
    )
    ```
 
-   ### 引数
+3. 初期化
+   
+   ```js
+    インスタンス名.init();
+    ```
+
+> [!CAUTION]
+> 初期化関数init()を実行しないとエラーが発生します
+
+### 引数
 
    - 1: 必須：<テーブルのフィールドコード> :string
    - 2: オプション：<Attribute の設定オブジェクト>:Object
@@ -32,7 +41,6 @@
    - 3: オプション：<EventListener の設定オブジェクト>:Object
      - default は`{}`
    - 4: オプション：<window の最大枚数>:number
-
      - 無制限の場合は`null`を指定
      - default は`null`
 
@@ -42,7 +50,7 @@
      // 第2,3,4引数はdefault値でインスタンス化される
      ```
 
-3. Attribute の設定オブジェクト
+1. Attribute の設定オブジェクト
 
    ```js
    {
@@ -71,8 +79,17 @@
 
    - original attribute
      - `initial`: input dom の初期値
+     - `select`: selectタグの作成
+       - `select`の場合は、value に配列を渡す
+        ```js
+        const attribute_obj = {
+          関係: {
+            select: ["本人", "子供", "親"],
+          },
+        };
+        ```
 
-4. EventListener の設定オブジェクト
+2. EventListener の設定オブジェクト
 
    ```js
    {fieldcode:{timing:function, ...}, ... }
@@ -93,7 +110,7 @@
 
    `timing`は[こちら](https://web-designer.cman.jp/javascript_ref/event_list/)を参照
 
-5. datalist の設定
+3. datalist の設定**（非推奨）**
    ```js
    FBTableModalInstance.setDatalist("relationship", ["本人", "子供", "親"]); //datalistを設置
    ```
@@ -112,6 +129,9 @@ function allScriptsLoaded() {
       autocomplete: "tel",
       inputmode: "tel",
       placeholder: "ハイフンは自動挿入されます",
+    },
+    関係: {
+      select: ["本人", "子供", "親"],
     },
   }; //attributeの設定object
   const emergency_list_listener_obj = {
