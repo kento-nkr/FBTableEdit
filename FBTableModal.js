@@ -67,6 +67,7 @@ class FBTableModal {
     modalElement.setAttribute("role", "dialog");
     modalElement.setAttribute("aria-labelledby", `${this.modalId}Label`);
     modalElement.setAttribute("aria-hidden", "true");
+    modalElement.setAttribute("overscroll-behavior-y", "contain");
 
     const modalDialog = document.createElement("div");
     modalDialog.setAttribute("class", "modal-dialog");
