@@ -4,7 +4,13 @@
 
 ## 使い方
 
-1. form の dom 生成が終わるまで待機
+1. This script is available through CDN service. Please include the URL below in your production.
+
+   ```sh
+   https://cdn.jsdelivr.net/gh/kento-nkr/FBTableModal@20240808/FBTableModal.js
+   ```
+
+3. form の dom 生成が終わるまで待機
 
    ```js
    document.addEventListener("DOMContentLoaded", function (event) {
@@ -13,7 +19,7 @@
    });
    ```
 
-2. class のインスタンスを作成
+4. class のインスタンスを作成
 
    ```js
    const インスタンス名 = new FBTableModal(
